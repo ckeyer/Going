@@ -5,6 +5,6 @@ Going
 
 * [summation.go](#summation.go)
 
-# summation.go
-
+## summation.go
 基于多线程的累加方案
+
