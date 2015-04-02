@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	USE_GOROUTINES = 100
+	USE_GOROUTINES = 5
 	MAX_INDEX      = 100000000000
 )
 
