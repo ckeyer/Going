@@ -18,7 +18,7 @@ func NewCKInt(s string) *CKInt {
 	//bs := make([]byte, len(s))
 	bs := []byte(s)
 	for {
-		if bs[0] == '0' {
+		if bs[0] == '0' || bs[0] == 0 {
 			bs = bs[1:]
 		} else {
 			break
@@ -47,7 +47,8 @@ func (this *CKInt) ToString() string {
 	return s
 }
 
-func (a *CKInt) Sum(b *CKInt) *CKInt {
+// +
+func (a *CKInt) Add(b *CKInt) *CKInt {
 	length := a.Length
 	lastInt := func(bs []byte) byte {
 		return bs[len(bs)-1]
@@ -82,9 +83,37 @@ func (a *CKInt) Sum(b *CKInt) *CKInt {
 	return &CKInt{V: cbs, Length: len(cbs)}
 }
 
+// *
+func (a *CKInt) Mul(b *CKInt) *CKInt {
+	length := a.Length + b.Length
+	cbs := make([]byte, length)
+	i := 0
+	for ; i < a.Length; i++ {
+		for j := 0; j < b.Length; j++ {
+			tmp := a.V[i] * b.V[j]
+			if tmp >= 10 {
+				cbs[j+i+1] += tmp / 10
+				tmp %= 10
+			}
+			cbs[i+j] += tmp
+			if cbs[i+j] >= 10 {
+				cbs[i+j+1] += cbs[i+j] / 10
+				cbs[i+j] %= 10
+			}
+		}
+	}
+	return &CKInt{V: cbs, Length: len(cbs)}
+}
+
 func main() {
-	a := NewCKInt("990000000000567")
-	b := NewCKInt("9234567")
-	c := a.Sum(b)
+	var ai int64 = 9999999999
+	var bi int64 = 999999999999999
+	a := NewCKInt(fmt.Sprint(ai))
+	b := NewCKInt(fmt.Sprint(bi))
+	c := a.Add(b)
+	d := a.Mul(b)
 	fmt.Printf("%s + %s = %s\n", a.ToString(), b.ToString(), c.ToString())
+	fmt.Printf("%d + %d = %d\n\n", ai, bi, ai+bi)
+	fmt.Printf("%s * %s = %s\n", a.ToString(), b.ToString(), d.ToString())
+	fmt.Printf("%d * %d = %d\n\n", ai, bi, ai*bi)
 }
