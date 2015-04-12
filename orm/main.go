@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 var CKLog = beego.BeeLogger
@@ -14,15 +15,18 @@ func init() {
 }
 
 type User struct {
-	Id    int
-	Name  string
-	Grade *Grade `orm:"rel(one)"` // OneToOne relation
+	Id      int64
+	Name    string
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
 }
 
-type Grade struct {
-	Id    int
-	Grade int16
-	User  *User `orm:"reverse(one)"` // 设置反向关系(可选)
+type Blog struct {
+	Id      int64
+	Content string
+	User    *User     `orm:"rel(fk)"` // 设置反向关系(可选)
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
 }
 
 func initORM() {
@@ -32,7 +36,7 @@ func initORM() {
 	orm.RegisterDataBase("default", "mysql", "ckeyer:wangcj@/db_test?charset=utf8", 10, 10)
 
 	orm.RegisterModelWithPrefix("tb_", new(User))
-	orm.RegisterModelWithPrefix("tb_", new(Grade))
+	orm.RegisterModelWithPrefix("tb_", new(Blog))
 
 	name := "default"
 	force := true
@@ -44,18 +48,36 @@ func initORM() {
 	}
 }
 
+func (this *Blog) Update() error {
+	o := orm.NewOrm()
+	_, e := o.Update(this)
+	if e != nil {
+		return e
+	}
+
+	return nil
+}
+
 func main() {
 	initORM()
 	o := orm.NewOrm()
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 
-	grade := new(Grade)
-	grade.Grade = 30
-
 	user := new(User)
-	user.Grade = grade
 	user.Name = "slene"
 
-	fmt.Println(o.Insert(grade))
+	blog := new(Blog)
+	blog.User = user
+	blog.Content = "hahahhahah"
+
+	// user.Created = time.Now()
+	// user.Updated = time.Now()
+	// blog.Created = time.Now()
+	// blog.Updated = time.Now()
+
 	fmt.Println(o.Insert(user))
+	fmt.Println(o.Insert(blog))
+	time.Sleep(2 * time.Second)
+	blog.Content = "123update"
+	blog.Update()
 }
