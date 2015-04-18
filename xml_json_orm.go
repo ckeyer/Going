@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/astaxie/beego/orm"
 )
 
 type TestUser struct {
@@ -17,5 +18,18 @@ type TestClass struct {
 }
 
 func main() {
+	class1 := &TestClass{
+		Name: "Math",
+	}
+
+	user1 := &TestUser{
+		Name:  "ckeyer",
+		Class: class1,
+	}
+	bsjson, _ := json.Marshal(user1)
+	bsxml, _ := xml.Marshal(user1)
+
+	fmt.Printf("%s\n", bsjson)
+	fmt.Printf("%s\n", bsxml)
 
 }
